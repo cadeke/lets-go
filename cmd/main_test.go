@@ -10,57 +10,32 @@ import (
 
 func TestReadPassphrase(t *testing.T) {
 	tests := []struct {
-		name        string
-		input       string
-		expected    string
-		expectError bool
+		name          string
+		firstAttempt  string
+		secondAttempt string
+		result        string
+		expectError   bool
 	}{
 		{
-			name:        "Matching passphrases",
-			input:       "secret-password\nsecret-password\n",
-			expected:    "secret-password",
-			expectError: false,
+			name:          "Matching passphrases",
+			firstAttempt:  "my-secret-password",
+			secondAttempt: "my-secret-password",
+			result:        "my-secret-password",
+			expectError:   false,
 		},
 		{
-			name:        "Non-matching passphrases",
-			input:       "a-simple-password\nanother-simple-password\n",
-			expected:    "",
-			expectError: true,
-		}, {
-			name:        "Matching passphrases with spaces",
-			input:       "my strong password\nmy strong password\n",
-			expected:    "my strong password",
-			expectError: false,
+			name:          "Non-matching passphrases",
+			firstAttempt:  "my-secret-password-123",
+			secondAttempt: "my-secret-password-456",
+			result:        "",
+			expectError:   true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Backup the original os.Stdin
-			originalStdin := os.Stdin
-			originalStdout := os.Stdout
-			defer func() {
-				os.Stdin = originalStdin
-				os.Stdout = originalStdout
-			}()
 
-			// Set the os.Stdin to the test input
-			r, w, _ := os.Pipe()
-			_, _ = w.WriteString(tt.input)
-			_ = w.Close()
-			os.Stdin = r
-
-			// Redirect os.Stdout to a pipe (hiding stdOut)
-			stdoutR, stdoutW, _ := os.Pipe()
-			os.Stdout = stdoutW
-			defer stdoutW.Close()
-
-			// Call the function
-			result, err := readPassphrase()
-
-			// Close stdoutW and read from stdoutR to discard the output
-			_ = stdoutW.Close()
-			_, _ = io.ReadAll(stdoutR)
+			result, err := doubleCheck(tt.firstAttempt, tt.secondAttempt)
 
 			// Check for expected error
 			if (err != nil) != tt.expectError {
@@ -68,8 +43,8 @@ func TestReadPassphrase(t *testing.T) {
 			}
 
 			// Check for expected result
-			if result != tt.expected {
-				t.Errorf("expected result: %v, got: %v", tt.expected, result)
+			if result != tt.result {
+				t.Errorf("expected result: %v, got: %v", tt.result, result)
 			}
 		})
 	}

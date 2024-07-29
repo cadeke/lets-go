@@ -18,3 +18,4 @@ test:
 clean:
 	go clean
 	rm bin/*
+	rm tmp/*.enc

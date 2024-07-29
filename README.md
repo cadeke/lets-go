@@ -7,8 +7,8 @@
 The goal of this project was to learn more about applied cryptography, while getting more familiar with the Go programming language.
 
 ## Future improvements
-- [ ] Add secure input reader
+- [x] Add secure input reader
 - [x] Add simple unit/fuzz testing
-- [ ] Add steghide functionality
 - [ ] Add [Cobra](https://github.com/spf13/cobra) library
 - [ ] Setup GitHub actions for CI/CD
+- [ ] Add steghide functionality

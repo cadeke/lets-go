@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
@@ -12,6 +11,8 @@ import (
 	"log"
 	"os"
 	"strings"
+
+	"golang.org/x/term"
 )
 
 const ENC_EXTENSION string = ".enc"
@@ -82,19 +83,26 @@ func decryptFile(filename string, key []byte) error {
 
 // Read passphrase from user, using double verification
 func readPassphrase() (string, error) {
-	reader := bufio.NewReader(os.Stdin)
-
 	fmt.Print("Enter passphrase: ")
-	firstAttempt, _ := reader.ReadString('\n')
+	firstAttempt, _ := term.ReadPassword(int(os.Stdin.Fd()))
+	firstPw := string(firstAttempt)
+	fmt.Println()
 
 	fmt.Print("Verify passphrase: ")
-	secondAttempt, _ := reader.ReadString('\n')
+	secondAttempt, _ := term.ReadPassword(int(os.Stdin.Fd()))
+	secondPw := string(secondAttempt)
+	fmt.Println()
 
-	if firstAttempt != secondAttempt {
+	return doubleCheck(firstPw, secondPw)
+}
+
+// Double check if passwords match
+func doubleCheck(p1 string, p2 string) (string, error) {
+	if p1 != p2 {
 		return "", errors.New("passphrases don't match")
+	} else {
+		return strings.TrimSpace(p1), nil
 	}
-
-	return strings.TrimSpace(firstAttempt), nil
 }
 
 func main() {
