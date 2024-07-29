@@ -8,7 +8,7 @@ The goal of this project was to learn more about applied cryptography, while get
 
 ## Future improvements
 - [ ] Add secure input reader
-- [ ] Add simple unit/fuzz testing
+- [x] Add simple unit/fuzz testing
 - [ ] Add steghide functionality
 - [ ] Add [Cobra](https://github.com/spf13/cobra) library
 - [ ] Setup GitHub actions for CI/CD

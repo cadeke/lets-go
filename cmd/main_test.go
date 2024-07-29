@@ -212,12 +212,12 @@ func TestDecryptFile(t *testing.T) {
 	// Read the decrypted file
 	content, err := os.ReadFile(tmpFile.Name())
 	if err != nil {
-		t.Fatalf("Failed to read encrypted file: %v", err)
+		t.Fatalf("Failed to read decrypted file: %v", err)
 	}
 
 	// Check if data is correct
 	data := string(content)
 	if data != TEST_DATA {
-		t.Errorf("Encrypted file doesn't have the right data. Expected: %v, got: %v", TEST_DATA, data)
+		t.Errorf("Decrypted file doesn't have the right data. Expected: %v, got: %v", TEST_DATA, data)
 	}
 }
