@@ -1,8 +1,10 @@
 package main
 
 import (
+	"crypto/rand"
 	"io"
 	"os"
+	"reflect"
 	"testing"
 )
 
@@ -24,6 +26,11 @@ func TestReadPassphrase(t *testing.T) {
 			input:       "a-simple-password\nanother-simple-password\n",
 			expected:    "",
 			expectError: true,
+		}, {
+			name:        "Matching passphrases with spaces",
+			input:       "my strong password\nmy strong password\n",
+			expected:    "my strong password",
+			expectError: false,
 		},
 	}
 
@@ -65,5 +72,152 @@ func TestReadPassphrase(t *testing.T) {
 				t.Errorf("expected result: %v, got: %v", tt.expected, result)
 			}
 		})
+	}
+}
+
+func TestGenerateKey(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected []byte
+	}{
+		{
+			name:     "Simple passphrase",
+			input:    "my-secret-password",
+			expected: []byte{169, 201, 12, 71, 194, 49, 175, 179, 25, 80, 22, 156, 203, 137, 149, 19, 55, 235, 6, 137, 211, 22, 96, 227, 44, 52, 131, 91, 183, 1, 140, 12},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			result := generateKey(tt.input)
+
+			if !reflect.DeepEqual(result, tt.expected) {
+				t.Errorf("expected result: %v, got: %v", tt.expected, result)
+			}
+
+		})
+	}
+}
+
+func TestEncryptFile(t *testing.T) {
+	// Create temp directory
+	tmpDir, err := os.MkdirTemp("", "encryptFileTest")
+	if err != nil {
+		t.Fatalf("Failed to create temp directory: %v", err)
+	}
+	defer os.RemoveAll(tmpDir) // cleanup
+
+	// Create temp file
+	tmpFile, err := os.CreateTemp(tmpDir, "testfile")
+	if err != nil {
+		t.Fatalf("Failed to create temp file: %v", err)
+	}
+	defer tmpFile.Close()
+
+	// Write text to temp file
+	plaintext := []byte("This is a test. Testing 123...")
+	if _, err := tmpFile.Write(plaintext); err != nil {
+		t.Fatalf("Failed to write to temp file: %v", err)
+	}
+	tmpFile.Close()
+
+	// Generate key for encryption
+	key := make([]byte, 32) // 32 bytes for AES-256
+	if _, err := io.ReadFull(rand.Reader, key); err != nil {
+		t.Fatalf("Failed to generate encryption key: %v", err)
+	}
+
+	// Encrypt file
+	err = encryptFile(tmpFile.Name(), key)
+	if err != nil {
+		t.Fatalf("Failed to encrypt file: %v", err)
+	}
+
+	// Check if encrypted file exists
+	encFilename := tmpFile.Name() + ENC_EXTENSION
+	if _, err := os.Stat(encFilename); os.IsNotExist(err) {
+		t.Errorf("Encrypted file does not exist: %v", err)
+	}
+
+	// Read encrypted file
+	encContent, err := os.ReadFile(encFilename)
+	if err != nil {
+		t.Fatalf("Failed to read encrypted file: %v", err)
+	}
+
+	// Check if encrypted file has data
+	if len(encContent) == 0 {
+		t.Errorf("Encrypted file is empty")
+	}
+}
+
+func TestDecryptFile(t *testing.T) {
+
+	const TEST_DATA string = "This is a test file. Testing 123..."
+
+	// Create temp directory
+	tmpDir, err := os.MkdirTemp("", "decryptFileTest")
+	if err != nil {
+		t.Fatalf("Failed to create temp directory: %v", err)
+	}
+	defer os.RemoveAll(tmpDir) // cleanup
+
+	// Create temp file
+	tmpFile, err := os.CreateTemp(tmpDir, "testfile")
+
+	if err != nil {
+		t.Fatalf("Failed to create temp file: %v", err)
+	}
+	defer tmpFile.Close()
+
+	// Write text to temp file
+	plaintext := []byte(TEST_DATA)
+	if _, err := tmpFile.Write(plaintext); err != nil {
+		t.Fatalf("Failed to write to temp file: %v", err)
+	}
+	tmpFile.Close()
+
+	// Generate key
+	key := make([]byte, 32) // AES-256
+	if _, err := io.ReadFull(rand.Reader, key); err != nil {
+		t.Fatalf("Failed to generate encryption key: %v", err)
+	}
+
+	// Encrypt file
+	err = encryptFile(tmpFile.Name(), key)
+	if err != nil {
+		t.Fatalf("Failed to encrypt file: %v", err)
+	}
+
+	// Remove original file
+	err = os.Remove(tmpFile.Name())
+	if err != nil {
+		t.Fatalf("Failed to remove original file: %v", err)
+	}
+
+	// Decrypt file
+	encFilename := tmpFile.Name() + ENC_EXTENSION
+	err = decryptFile(encFilename, key)
+
+	if err != nil {
+		t.Fatalf("Failed to decrypt file: %v", err)
+	}
+
+	if _, err := os.Stat(tmpFile.Name()); os.IsNotExist(err) {
+		t.Errorf("Decrypted file does not exist: %v", err)
+	}
+
+	// Read the decrypted file
+	content, err := os.ReadFile(tmpFile.Name())
+	if err != nil {
+		t.Fatalf("Failed to read encrypted file: %v", err)
+	}
+
+	// Check if data is correct
+	data := string(content)
+	if data != TEST_DATA {
+		t.Errorf("Encrypted file doesn't have the right data. Expected: %v, got: %v", TEST_DATA, data)
 	}
 }

@@ -13,7 +13,7 @@ build-mac:
 	GOOS=darwin GOARCH=amd64 go build -o ${BINARY_NAME}-macos ${SOURCE_FILE}
 
 test:
-	go test -v ./cmd
+	go test -v ./cmd -cover
 
 clean:
 	go clean
