@@ -14,7 +14,7 @@ import (
 	"strings"
 )
 
-const ENC_EXTENTION string = ".enc"
+const ENC_EXTENSION string = ".enc"
 
 // Generate 32-byte key from a string using SHA-256
 func generateKey(input string) []byte {
@@ -46,7 +46,7 @@ func encryptFile(filename string, key []byte) error {
 	}
 
 	ciphertext := gcm.Seal(nonce, nonce, plaintext, nil)
-	return os.WriteFile(filename+ENC_EXTENTION, ciphertext, 0644)
+	return os.WriteFile(filename+ENC_EXTENSION, ciphertext, 0644)
 }
 
 // Decrypt file using AES-GCM
@@ -77,7 +77,7 @@ func decryptFile(filename string, key []byte) error {
 		return err
 	}
 
-	return os.WriteFile(strings.TrimSuffix(filename, ENC_EXTENTION), plaintext, 0644)
+	return os.WriteFile(strings.TrimSuffix(filename, ENC_EXTENSION), plaintext, 0644)
 }
 
 // Read passphrase from user, using double verification
