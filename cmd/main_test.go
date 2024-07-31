@@ -8,6 +8,8 @@ import (
 	"testing"
 )
 
+// Test for reading passphrases.
+// Checks if double verification of passphrases works correctly.
 func TestReadPassphrase(t *testing.T) {
 	tests := []struct {
 		name          string
@@ -50,6 +52,8 @@ func TestReadPassphrase(t *testing.T) {
 	}
 }
 
+// Test for key generation.
+// Checks if key generated from an input string works correctly.
 func TestGenerateKey(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -71,11 +75,12 @@ func TestGenerateKey(t *testing.T) {
 			if !reflect.DeepEqual(result, tt.expected) {
 				t.Errorf("expected result: %v, got: %v", tt.expected, result)
 			}
-
 		})
 	}
 }
 
+// Test for encrypting a file.
+// Checks if a file can be read and encrypted correctly.
 func TestEncryptFile(t *testing.T) {
 	// Create temp directory
 	tmpDir, err := os.MkdirTemp("", "encryptFileTest")
@@ -128,6 +133,8 @@ func TestEncryptFile(t *testing.T) {
 	}
 }
 
+// Test for decrypting a file.
+// Checks if a file can be first read and encrypted, then decrypted and read again.
 func TestDecryptFile(t *testing.T) {
 
 	const TEST_DATA string = "This is a test file. Testing 123..."
