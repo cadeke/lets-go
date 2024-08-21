@@ -17,13 +17,19 @@ import (
 
 const ENC_EXTENSION string = ".enc"
 
-// Generate 32-byte key from a string using SHA-256
+// generateKey generates a 32-byte key from a given input string using SHA-256.
+//
+// The input string is hashed using SHA-256 to produce a fixed-size key.
 func generateKey(input string) []byte {
 	hash := sha256.Sum256([]byte(input))
 	return hash[:]
 }
 
-// Encrypt file using AES-GCM
+// encryptFile encrypts a file using the provided key.
+//
+// filename is the path to the file to be encrypted.
+// key is the encryption key.
+// Returns an error if encryption fails.
 func encryptFile(filename string, key []byte) error {
 	plaintext, err := os.ReadFile(filename)
 	if err != nil {
@@ -50,7 +56,11 @@ func encryptFile(filename string, key []byte) error {
 	return os.WriteFile(filename+ENC_EXTENSION, ciphertext, 0644)
 }
 
-// Decrypt file using AES-GCM
+// decryptFile decrypts a file using the provided key.
+//
+// filename is the path to the file to be decrypted.
+// key is the decryption key.
+// Returns an error if decryption fails.
 func decryptFile(filename string, key []byte) error {
 	ciphertext, err := os.ReadFile(filename)
 	if err != nil {
@@ -81,7 +91,9 @@ func decryptFile(filename string, key []byte) error {
 	return os.WriteFile(strings.TrimSuffix(filename, ENC_EXTENSION), plaintext, 0644)
 }
 
-// Read passphrase from user, using double verification
+// readPassphrase reads and verifies a passphrase from the user.
+//
+// Returns a string containing the verified passphrase and an error if verification fails.
 func readPassphrase() (string, error) {
 	fmt.Print("Enter passphrase: ")
 	firstAttempt, _ := term.ReadPassword(int(os.Stdin.Fd()))
@@ -96,7 +108,10 @@ func readPassphrase() (string, error) {
 	return doubleCheck(firstPw, secondPw)
 }
 
-// Double check if passwords match
+// doubleCheck checks if two input passphrases match and returns the trimmed passphrase if they do.
+//
+// p1 and p2 are the two passphrases to be compared.
+// Returns the trimmed passphrase as a string and an error if the passphrases do not match.
 func doubleCheck(p1 string, p2 string) (string, error) {
 	if p1 != p2 {
 		return "", errors.New("passphrases don't match")
@@ -105,6 +120,10 @@ func doubleCheck(p1 string, p2 string) (string, error) {
 	}
 }
 
+// main is the entry point of the program.
+//
+// It expects two command-line arguments: the action to perform (encrypt or decrypt) and the filename.
+// It returns no value but prints the result of the operation to the console.
 func main() {
 	if len(os.Args) != 3 {
 		fmt.Println("Usage: lets-go <encrypt|decrypt> <filename>")

@@ -12,3 +12,5 @@ The goal of this project was to learn more about applied cryptography, while get
 - [ ] Add [Cobra](https://github.com/spf13/cobra) library
 - [ ] Setup GitHub actions for CI/CD
 - [ ] Add steghide functionality
+- [ ] Add better readme using [readme.so](https://readme.so/)
+- [ ] Add stripped build commands
