@@ -70,7 +70,7 @@ func TestGenerateKey(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			result := generateKey(tt.input)
+			result := GenerateKey(tt.input)
 
 			if !reflect.DeepEqual(result, tt.expected) {
 				t.Errorf("expected result: %v, got: %v", tt.expected, result)
@@ -110,7 +110,7 @@ func TestEncryptFile(t *testing.T) {
 	}
 
 	// Encrypt file
-	err = encryptFile(tmpFile.Name(), key)
+	err = EncryptFile(tmpFile.Name(), key)
 	if err != nil {
 		t.Fatalf("Failed to encrypt file: %v", err)
 	}
@@ -168,7 +168,7 @@ func TestDecryptFile(t *testing.T) {
 	}
 
 	// Encrypt file
-	err = encryptFile(tmpFile.Name(), key)
+	err = EncryptFile(tmpFile.Name(), key)
 	if err != nil {
 		t.Fatalf("Failed to encrypt file: %v", err)
 	}
@@ -181,7 +181,7 @@ func TestDecryptFile(t *testing.T) {
 
 	// Decrypt file
 	encFilename := tmpFile.Name() + ENC_EXTENSION
-	err = decryptFile(encFilename, key)
+	err = DecryptFile(encFilename, key)
 
 	if err != nil {
 		t.Fatalf("Failed to decrypt file: %v", err)
