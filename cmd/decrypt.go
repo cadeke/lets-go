@@ -19,7 +19,7 @@ var decryptCmd = &cobra.Command{
 
 		keyString, err := lib.ReadPassphrase()
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("Failed to read passphrase: %v\n", err)
 		}
 
 		key := lib.GenerateKey(keyString)
@@ -27,7 +27,7 @@ var decryptCmd = &cobra.Command{
 		// Decrypt the file
 		err = lib.DecryptFile(filename, key)
 		if err != nil {
-			fmt.Printf("Failed to decrypt file: %v\n", err)
+			log.Fatalf("Failed to decrypt file: %v\n", err)
 		}
 		fmt.Println("File decrypted successfully")
 		if useSteghide {

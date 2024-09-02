@@ -2,12 +2,13 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"lets-go/lib"
 	"log"
+
+	"github.com/spf13/cobra"
 )
 
-// / encryptCmd represents the encrypt command
+// encryptCmd represents the encrypt command
 var encryptCmd = &cobra.Command{
 	Use:   "encrypt [filename]",
 	Short: "Encrypt a file",
@@ -18,7 +19,7 @@ var encryptCmd = &cobra.Command{
 
 		keyString, err := lib.ReadPassphrase()
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("Failed to read passphrase: %v\n", err)
 		}
 
 		key := lib.GenerateKey(keyString)

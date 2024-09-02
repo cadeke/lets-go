@@ -1,9 +1,10 @@
 package cmd
 
 import (
-	"fmt"
-	"github.com/spf13/cobra"
+	"log"
 	"os"
+
+	"github.com/spf13/cobra"
 )
 
 var cfgFile string
@@ -16,10 +17,7 @@ var rootCmd = &cobra.Command{
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
+		log.Fatalf("Failed to execute command: %v\n", err)
 		os.Exit(1)
 	}
-}
-
-func init() {
 }
