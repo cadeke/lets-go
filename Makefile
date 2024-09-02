@@ -1,5 +1,5 @@
 BINARY_NAME=bin/lets-go
-SOURCE_FILE=cmd/main.go
+SOURCE_FILE=main.go
 
 build: build-win build-lin build-mac
 
@@ -13,7 +13,7 @@ build-mac:
 	GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -o ${BINARY_NAME}-macos ${SOURCE_FILE}
 
 test:
-	go test -v ./cmd -cover
+	go test -v ./lib -cover
 
 clean:
 	go clean

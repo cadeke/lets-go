@@ -1,4 +1,4 @@
-package main
+package lib
 
 import (
 	"crypto/aes"
@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"strings"
 
@@ -20,7 +19,7 @@ const ENC_EXTENSION string = ".enc"
 // generateKey generates a 32-byte key from a given input string using SHA-256.
 //
 // The input string is hashed using SHA-256 to produce a fixed-size key.
-func generateKey(input string) []byte {
+func GenerateKey(input string) []byte {
 	hash := sha256.Sum256([]byte(input))
 	return hash[:]
 }
@@ -30,7 +29,7 @@ func generateKey(input string) []byte {
 // filename is the path to the file to be encrypted.
 // key is the encryption key.
 // Returns an error if encryption fails.
-func encryptFile(filename string, key []byte) error {
+func EncryptFile(filename string, key []byte) error {
 	plaintext, err := os.ReadFile(filename)
 	if err != nil {
 		return err
@@ -61,7 +60,7 @@ func encryptFile(filename string, key []byte) error {
 // filename is the path to the file to be decrypted.
 // key is the decryption key.
 // Returns an error if decryption fails.
-func decryptFile(filename string, key []byte) error {
+func DecryptFile(filename string, key []byte) error {
 	ciphertext, err := os.ReadFile(filename)
 	if err != nil {
 		return err
@@ -94,7 +93,7 @@ func decryptFile(filename string, key []byte) error {
 // readPassphrase reads and verifies a passphrase from the user.
 //
 // Returns a string containing the verified passphrase and an error if verification fails.
-func readPassphrase() (string, error) {
+func ReadPassphrase() (string, error) {
 	fmt.Print("Enter passphrase: ")
 	firstAttempt, _ := term.ReadPassword(int(os.Stdin.Fd()))
 	firstPw := string(firstAttempt)
@@ -117,45 +116,5 @@ func doubleCheck(p1 string, p2 string) (string, error) {
 		return "", errors.New("passphrases don't match")
 	} else {
 		return strings.TrimSpace(p1), nil
-	}
-}
-
-// main is the entry point of the program.
-//
-// It expects two command-line arguments: the action to perform (encrypt or decrypt) and the filename.
-// It returns no value but prints the result of the operation to the console.
-func main() {
-	if len(os.Args) != 3 {
-		fmt.Println("Usage: lets-go <encrypt|decrypt> <filename>")
-		return
-	}
-
-	action := os.Args[1]
-	filename := os.Args[2]
-
-	keyString, err := readPassphrase()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	key := generateKey(keyString)
-
-	switch action {
-	case "encrypt", "enc":
-		err := encryptFile(filename, key)
-		if err != nil {
-			fmt.Printf("Failed to encrypt file: %v\n", err)
-		} else {
-			fmt.Println("File encrypted successfully")
-		}
-	case "decrypt", "dec":
-		err := decryptFile(filename, key)
-		if err != nil {
-			fmt.Printf("Failed to decrypt file: %v\n", err)
-		} else {
-			fmt.Println("File decrypted successfully")
-		}
-	default:
-		fmt.Println("Unknown action:", action)
 	}
 }
