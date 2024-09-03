@@ -19,10 +19,12 @@ var decryptCmd = &cobra.Command{
 		filename := args[0]
 		useSteg, _ := cmd.Flags().GetBool("steghide")
 		if useSteg {
+			filename = "extracted.txt.enc"
 			err := lib.Extract(filename)
 			if err != nil {
 				log.Fatalf("Failed to extract file: %v\n", err)
 			}
+			fmt.Println("File extracted successfully")
 		}
 
 		keyString, err := lib.ReadPassphrase()
@@ -32,7 +34,7 @@ var decryptCmd = &cobra.Command{
 
 		key := lib.GenerateKey(keyString)
 
-		err = lib.DecryptFile("extracted.txt.enc", key)
+		err = lib.DecryptFile(filename, key)
 		if err != nil {
 			log.Fatalf("Failed to decrypt file: %v\n", err)
 		}

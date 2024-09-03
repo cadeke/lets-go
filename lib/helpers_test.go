@@ -110,13 +110,17 @@ func TestEncryptFile(t *testing.T) {
 	}
 
 	// Encrypt file
-	err = EncryptFile(tmpFile.Name(), key)
+	encFilename, err := EncryptFile(tmpFile.Name(), key)
 	if err != nil {
 		t.Fatalf("Failed to encrypt file: %v", err)
 	}
 
+	// Check name of encrypted file
+	if encFilename != tmpFile.Name()+ENC_EXTENSION {
+		t.Errorf("Encrypted file name does not match: %v", encFilename)
+	}
+
 	// Check if encrypted file exists
-	encFilename := tmpFile.Name() + ENC_EXTENSION
 	if _, err := os.Stat(encFilename); os.IsNotExist(err) {
 		t.Errorf("Encrypted file does not exist: %v", err)
 	}
@@ -168,7 +172,7 @@ func TestDecryptFile(t *testing.T) {
 	}
 
 	// Encrypt file
-	err = EncryptFile(tmpFile.Name(), key)
+	_, err = EncryptFile(tmpFile.Name(), key)
 	if err != nil {
 		t.Fatalf("Failed to encrypt file: %v", err)
 	}

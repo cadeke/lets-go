@@ -34,8 +34,8 @@ var encryptCmd = &cobra.Command{
 		fmt.Println("File encrypted successfully")
 
 		if stegFile != "" {
-			fmt.Println("Steghide option is selected. (Mock implementation)")
 			err = lib.Embed(file, stegFile)
+			fmt.Println("File embedded successfully")
 			if err != nil {
 				log.Fatalf("Failed to embed file: %v\n", err)
 			}
