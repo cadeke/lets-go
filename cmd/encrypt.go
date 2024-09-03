@@ -17,6 +17,11 @@ var encryptCmd = &cobra.Command{
 		filename := args[0]
 		useSteghide, _ := cmd.Flags().GetBool("steghide")
 
+		if useSteghide {
+			fmt.Println("Steghide option is selected. (Mock implementation)")
+			// Add your Steghide implementation here			}
+		}
+
 		keyString, err := lib.ReadPassphrase()
 		if err != nil {
 			log.Fatalf("Failed to read passphrase: %v\n", err)
@@ -28,11 +33,8 @@ var encryptCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to encrypt file: %v\n", err)
 		}
+
 		fmt.Println("File encrypted successfully")
-		if useSteghide {
-			fmt.Println("Steghide option is selected. (Mock implementation)")
-			// Add your Steghide implementation here			}
-		}
 	},
 }
 
