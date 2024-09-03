@@ -33,30 +33,32 @@ func GenerateKey(input string) []byte {
 // filename is the path to the file to be encrypted.
 // key is the encryption key.
 // Returns an error if encryption fails.
-func EncryptFile(filename string, key []byte) error {
+func EncryptFile(filename string, key []byte) (string, error) {
 	plaintext, err := os.ReadFile(filename)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	nonce := make([]byte, gcm.NonceSize())
 	_, err = io.ReadFull(rand.Reader, nonce)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	ciphertext := gcm.Seal(nonce, nonce, plaintext, nil)
-	return os.WriteFile(filename+ENC_EXTENSION, ciphertext, 0644)
+	name := filename + ENC_EXTENSION
+
+	return name, os.WriteFile(name, ciphertext, 0644)
 }
 
 // decryptFile decrypts a file using the provided key.
@@ -124,7 +126,7 @@ func doubleCheck(p1 string, p2 string) (string, error) {
 }
 
 // embed embeds a data file into an image.
-func embed(filePath string, imagePath string) error {
+func Embed(filePath string, imagePath string) error {
 	inFile, err := os.Open(imagePath)
 	defer inFile.Close()
 
@@ -163,17 +165,20 @@ func embed(filePath string, imagePath string) error {
 }
 
 // extract extracts the embedded data from an image.
-func extract(filePath string) error {
+func Extract(filePath string) error {
 	inFile, _ := os.Open(filePath) // opening file
 	defer inFile.Close()
 
 	reader := bufio.NewReader(inFile) // buffer reader
-	img, _ := png.Decode(reader)      // decoding to golang's image.Image
+	img, err := png.Decode(reader)
+	if err != nil {
+		return err
+	}
 
 	sizeOfMessage := steg.GetMessageSizeFromImage(img) // retrieving message size to decode in the next line
 
 	msg := steg.Decode(sizeOfMessage, img) // decoding the message from the file
 
 	fmt.Println("message extracted!")
-	return os.WriteFile("extracted.txt", msg, 0644)
+	return os.WriteFile("extracted.txt.enc", msg, 0644)
 }
