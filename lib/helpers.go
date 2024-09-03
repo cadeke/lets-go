@@ -126,6 +126,10 @@ func doubleCheck(p1 string, p2 string) (string, error) {
 }
 
 // embed embeds a data file into an image.
+//
+// filePath is the path to the data file.
+// imagePath is the path to the image file.
+// Returns an error if something goes wrong.
 func Embed(filePath string, imagePath string) error {
 	inFile, err := os.Open(imagePath)
 	defer inFile.Close()
@@ -152,33 +156,34 @@ func Embed(filePath string, imagePath string) error {
 		return err
 	}
 
-	outFile, err := os.Create("out_file.png")
+	outFile, err := os.Create("embed_out_file.png")
+	defer outFile.Close()
 	if err != nil {
 		return err
 	}
 
 	w.WriteTo(outFile)
-	outFile.Close()
 
-	fmt.Println("message embedded!")
 	return nil
 }
 
 // extract extracts the embedded data from an image.
+//
+// filePath is the path to the image file.
+// Returns an error if something goes wrong.
 func Extract(filePath string) error {
-	inFile, _ := os.Open(filePath) // opening file
+	inFile, _ := os.Open(filePath)
 	defer inFile.Close()
 
-	reader := bufio.NewReader(inFile) // buffer reader
+	reader := bufio.NewReader(inFile)
 	img, err := png.Decode(reader)
 	if err != nil {
 		return err
 	}
 
-	sizeOfMessage := steg.GetMessageSizeFromImage(img) // retrieving message size to decode in the next line
+	sizeOfMessage := steg.GetMessageSizeFromImage(img)
 
-	msg := steg.Decode(sizeOfMessage, img) // decoding the message from the file
+	msg := steg.Decode(sizeOfMessage, img)
 
-	fmt.Println("message extracted!")
 	return os.WriteFile("extracted.txt.enc", msg, 0644)
 }

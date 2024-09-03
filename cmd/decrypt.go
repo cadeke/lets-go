@@ -19,7 +19,6 @@ var decryptCmd = &cobra.Command{
 		filename := args[0]
 		useSteg, _ := cmd.Flags().GetBool("steghide")
 		if useSteg {
-			fmt.Println("Steghide option is selected. (Mock implementation)")
 			err := lib.Extract(filename)
 			if err != nil {
 				log.Fatalf("Failed to extract file: %v\n", err)
