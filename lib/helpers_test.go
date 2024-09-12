@@ -65,6 +65,12 @@ func TestGenerateKey(t *testing.T) {
 			input:    "my-secret-password",
 			expected: []byte{169, 201, 12, 71, 194, 49, 175, 179, 25, 80, 22, 156, 203, 137, 149, 19, 55, 235, 6, 137, 211, 22, 96, 227, 44, 52, 131, 91, 183, 1, 140, 12},
 		},
+		{
+
+			name:     "Complex passphrase",
+			input:    "C5{b_FS=Dgdzc@;JUu!3L.#*GAveyW`97B+<",
+			expected: []byte{174, 227, 240, 56, 216, 19, 113, 55, 244, 193, 14, 137, 72, 179, 157, 214, 141, 48, 66, 234, 84, 59, 119, 6, 57, 42, 253, 159, 189, 21, 191, 200},
+		},
 	}
 
 	for _, tt := range tests {
